@@ -9,11 +9,11 @@ const TicTacToe = (lastReset) => {
 };
 
 const Connect6 = (lastReset) => {
-  return <Game n={9} movesToWin = {6} movesPerTurn={2} firstRoundMoves={1} lastReset={lastReset} />
+  return <Game n={19} movesToWin = {6} movesPerTurn={2} firstRoundMoves={1} lastReset={lastReset} />
 }
 
 export default function Home() {
-  const [gameType, setGameType] = useState("TTT");
+  const [gameType, setGameType] = useState("C6");
   const [lastReset, setLastReset] = useState(new Date());
   const changeGameType = () => {
     setLastReset(new Date());

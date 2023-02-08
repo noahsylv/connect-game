@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { getAiMove } from '../lib/ai';
+import { getAiMove, getAiMoveFromApi } from '../lib/ai';
+import { encodeGame } from '../lib/encode';
 import { BLACK, canMove, EMPTY, getOtherPlayer, getWinner, isPlayer, makeMove, resetBoard, unmakeMove, WHITE } from '../lib/gameLogic';
 
-export const AI = WHITE;
-// export const AI = 'NONE';
+// export const AI = WHITE;
+export const AI = BLACK;
 
 function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
 
@@ -39,14 +40,22 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
         setupGame();
     }), []);
 
-    useEffect(() => {
+    function handleAi() {
         if (player === null) return;
         // console.log(player);
         // console.log(needResultsChecked);
         if (!needResultsChecked && (player === AI)) {
             aiMove();
         }
-    }, [player, needResultsChecked])
+
+    }
+
+    useEffect(handleAi, [player, needResultsChecked]);
+
+    useEffect(() => {
+        const timer = setTimeout(handleAi, 2000);
+        return () => clearTimeout(timer);
+      }, []);
 
     function declareWinner(winner) {
         setWinner(winner);
@@ -96,6 +105,7 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
         } else {
             setMovesLeft(movesLeft - movesMade);
         }
+        console.log(encodeGame(board, n));
     }
 
 
@@ -143,8 +153,11 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
     function aiMove() {
         if (player !== AI) return;
         // console.log("requesting move");
-        const moves = getAiMove(board, AI, movesLeft, n, movesToWin);
-        placePieces(moves);
+        // const moves = getAiMove(board, AI, movesLeft, n, movesToWin);
+
+        getAiMoveFromApi(encodeGame(board, n), placePieces);
+
+        // placePieces(moves);
     }
 
     function tileIsSpecial(row, col) {
