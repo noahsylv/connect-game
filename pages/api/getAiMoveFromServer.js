@@ -1,7 +1,9 @@
 
 export default function handler(req, res) {
-    const { board } = req.query
-    fetch(process.env.SERVER + "get_move?board=" + board + "&game_id=1")  
+    const { board, player } = req.query
+    console.log("trying to get move for board " + board);
+    console.log("api is " + process.env.SERVER + "get_move?board=" + board + "&player="+player[0])
+    fetch(process.env.SERVER + "get_move?board=" + board + "&player="+player[0])  
     .then((response) => response.json())
     .then((data) => {
         console.log(data);

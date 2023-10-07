@@ -4,11 +4,12 @@ import { encodeGame } from '../lib/encode';
 import { BLACK, canMove, EMPTY, getOtherPlayer, getWinner, isPlayer, makeMove, resetBoard, unmakeMove, WHITE } from '../lib/gameLogic';
 
 // export const AI = WHITE;
-export const AI = BLACK;
+// export const AI = BLACK;
 
-function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
+function Game( { n, movesToWin, movesPerTurn, firstRoundMoves, humanPlayer, lastReset } ) {
 
     const [player, setPlayer] = useState();
+    const aiPlayer = humanPlayer === WHITE ? BLACK : WHITE;
     const [movesLeft, setMovesLeft] = useState();
     const [board, setBoard] = useState({});
     const [winner, setWinner] = useState(null);
@@ -38,13 +39,13 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
         // console.log("resetting");
         // alert("here");
         setupGame();
-    }), []);
+    }), [lastReset]);
 
     function handleAi() {
         if (player === null) return;
         // console.log(player);
         // console.log(needResultsChecked);
-        if (!needResultsChecked && (player === AI)) {
+        if (!needResultsChecked && (player === aiPlayer)) {
             aiMove();
         }
 
@@ -73,7 +74,11 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
         if (gameHasWinner()) {
             return winner + " wins!";
         } else {
-            return `It is ${player}'s turn with ${movesLeft} move(s) left`;
+            if (player !== aiPlayer) {
+                return `It is ${player}'s turn with ${movesLeft} move(s) left`;
+            } else {
+                return `It is ${player}'s turn with ${movesLeft} move(s) left`;
+            }
         }
     }
 
@@ -116,7 +121,7 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
         // 
         const wasPreviousPlayer = (movesLeft == movesPerTurn)
         const lastPlayer = wasPreviousPlayer ? getOtherPlayer(player) : player;
-        const undoingAiMoves = lastPlayer === AI;
+        const undoingAiMoves = lastPlayer === aiPlayer;
         const movesToUndo = undoingAiMoves ? movesPerTurn + 1 : 1;
         for (var i = 0; i < movesToUndo; i++) {
             if (moveStack.length == 0) break;
@@ -151,11 +156,11 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
     }
 
     function aiMove() {
-        if (player !== AI) return;
+        if (player !== aiPlayer) return;
         // console.log("requesting move");
         // const moves = getAiMove(board, AI, movesLeft, n, movesToWin);
 
-        getAiMoveFromApi(encodeGame(board, n), placePieces);
+        getAiMoveFromApi(encodeGame(board, n), player, placePieces);
 
         // placePieces(moves);
     }
@@ -184,7 +189,7 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
             tileIsSpecial(row, col)
             ? 'bg-[#8c613c]'
             : '');
-        if (winner === null && player !== AI) {
+        if (winner === null && player !== aiPlayer) {
             const playerColor = (player === WHITE ? "hover:bg-white" : "hover:bg-black");
             return playerColor + " cursor-pointer " + baseColor
             
@@ -194,6 +199,10 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
 
     const title = () => {
         return ((movesToWin == 3) ? "Tic tac toe" : `Connect ${movesToWin}`);
+    }
+
+    const showPlayers = () => {
+        return (aiPlayer === WHITE ? "Human=Black AI=White" : "Human=White AI=Black");
     }
 
     const getAxis = () => {
@@ -210,6 +219,9 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves } ) {
             <h1 className='text-4xl p-3 text-center'>
                 {title()}
             </h1>
+            <div className='text-xl text-center'>
+                {showPlayers()}
+            </div>
             <div className='text-xl text-center'>
                 {gameStatus()}
             </div>
