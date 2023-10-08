@@ -56,7 +56,7 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves, humanPlayer, last
     useEffect(() => {
         const timer = setTimeout(handleAi, 2000);
         return () => clearTimeout(timer);
-      }, []);
+      }, [lastReset]);
 
     function declareWinner(winner) {
         setWinner(winner);
@@ -233,7 +233,7 @@ function Game( { n, movesToWin, movesPerTurn, firstRoundMoves, humanPlayer, last
                     {[...Array(n).keys()].map((col, _) => (
                         <div key={'col ' + col} 
                         className={'text-3xl p-5 outline outline-black rounded-full ' + getTileColor(row, col)}
-                         onClick={() => {placePieces([[row, col]])}}
+                         onClick={() => {(player === humanPlayer) && placePieces([[row, col]])}}
                         >
                             {/* {board[row] == 'black' ? 'X' : ' '} */}
                             {/* {board[[row, col]]} */}
